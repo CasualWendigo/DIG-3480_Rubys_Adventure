@@ -1,14 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
+using System;
 
 ﻿public class RubyController : MonoBehaviour
 {
+    public TMP_Text scoreText;
+    public GameObject gameOverScreen;
+    public GameObject youWinScreen;
+
     public float speed = 3.0f;
-    
     public int maxHealth = 5;
     
     public GameObject projectilePrefab;
+
+    public ParticleSystem hurtEffect;
+    public ParticleSystem healEffect;
     
     public AudioClip throwSound;
     public AudioClip hitSound;
@@ -23,21 +32,30 @@ using UnityEngine;
     Rigidbody2D rigidbody2d;
     float horizontal;
     float vertical;
+
+    private bool gameOver;
     
     Animator animator;
     Vector2 lookDirection = new Vector2(1,0);
     
     AudioSource audioSource;
+
+    public int score = 0;
+    public int maxScore = 4;
     
     // Start is called before the first frame update
     void Start()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        hurtEffect.Stop();
+        healEffect.Stop();
         
         currentHealth = maxHealth;
 
         audioSource = GetComponent<AudioSource>();
+
+        scoreText.SetText("Fixed Robots: 0");
     }
 
     // Update is called once per frame
@@ -48,40 +66,36 @@ using UnityEngine;
         
         Vector2 move = new Vector2(horizontal, vertical);
         
-        if(!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f))
-        {
+        if(!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f)) {
             lookDirection.Set(move.x, move.y);
-            lookDirection.Normalize();
-        }
+            lookDirection.Normalize(); }
         
         animator.SetFloat("Look X", lookDirection.x);
         animator.SetFloat("Look Y", lookDirection.y);
         animator.SetFloat("Speed", move.magnitude);
         
-        if (isInvincible)
-        {
+        if (isInvincible) {
             invincibleTimer -= Time.deltaTime;
-            if (invincibleTimer < 0)
+            if (invincibleTimer < 0) {
                 isInvincible = false;
-        }
+                hurtEffect.Stop(); } }
         
+        // Shoot
         if(Input.GetKeyDown(KeyCode.C))
-        {
             Launch();
-        }
         
-        if (Input.GetKeyDown(KeyCode.X))
-        {
+        // Interact
+        if (Input.GetKeyDown(KeyCode.X)) {
             RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("NPC"));
-            if (hit.collider != null)
-            {
+            if (hit.collider != null) {
                 NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
-                if (character != null)
-                {
-                    character.DisplayDialog();
-                }
-            }
-        }
+                if (character != null) {
+                    character.DisplayDialog(); } } }
+
+        // Restart
+        if (Input.GetKey(KeyCode.R)) {
+            if (gameOver == true) {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } }
     }
     
     void FixedUpdate()
@@ -95,20 +109,38 @@ using UnityEngine;
 
     public void ChangeHealth(int amount)
     {
-        if (amount < 0)
-        {
+        if (amount < 0) { // If losing health...
             if (isInvincible)
                 return;
             
             isInvincible = true;
             invincibleTimer = timeInvincible;
+            animator.SetBool("Hit", true);
+            hurtEffect.Play();
             
-            PlaySound(hitSound);
-        }
+            PlaySound(hitSound); }
         
+        if (amount > 0)
+            healEffect.Play();
+
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-        
         UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+
+        if (currentHealth <= 0) {
+            gameOver = true;
+            gameOverScreen.SetActive(true);
+            speed = 0;
+        }
+    }
+
+    public void ChangeScore(int scoreAmount)
+    {
+        score = score + scoreAmount;
+        scoreText.text = "Fixed Robots: " + score.ToString();
+
+        if (score >= maxScore) {
+            youWinScreen.SetActive(true);
+        }
     }
     
     void Launch()

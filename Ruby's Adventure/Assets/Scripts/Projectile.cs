@@ -18,9 +18,9 @@ public class Projectile : MonoBehaviour
     
     void Update()
     {
-        if(transform.position.magnitude > 1000.0f)
+        if(transform.position.magnitude > 100.0f)
         {
-            Destroy(gameObject);
+            Projectile.Destroy(gameObject);
         }
     }
     
@@ -32,6 +32,6 @@ public class Projectile : MonoBehaviour
             e.Fix();
         }
     
-        Destroy(gameObject);
+        Projectile.Destroy(gameObject);
     }
 }
