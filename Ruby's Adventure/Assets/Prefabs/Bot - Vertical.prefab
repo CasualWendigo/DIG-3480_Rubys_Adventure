@@ -104,8 +104,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   vertical: 1
-  changeTime: 3
+  patrolTime: 3
+  maxHitPoints: 3
   smokeEffect: {fileID: 1631304587141782117}
+  robotFixed: {fileID: 8300000, guid: e7fa1971a86d60945bb64585c0ac14d5, type: 3}
+  metalHit1: {fileID: 8300000, guid: ae904c7305df7344d86b2092c0cb3a26, type: 3}
+  metalHit2: {fileID: 8300000, guid: 709a835b61b848644946696fdd5e5a4d, type: 3}
 --- !u!61 &5830047125490012847
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -123,7 +127,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2.56, y: 2.56}
+    oldSize: {x: 1.7066667, y: 1.7066667}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -295,7 +299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5974256892469938763, guid: e151dd0347cf53b4bbff5fbb1b9d3a95, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.965
+      value: 1.461
       objectReference: {fileID: 0}
     - target: {fileID: 5974256892469938763, guid: e151dd0347cf53b4bbff5fbb1b9d3a95, type: 3}
       propertyPath: m_LocalPosition.z

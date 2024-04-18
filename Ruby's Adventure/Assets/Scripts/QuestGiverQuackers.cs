@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NonPlayerCharacter : MonoBehaviour
+public class QuestGiverQuackers : MonoBehaviour
 {
     public float displayTime = 4.0f;
     public GameObject giveOutQuest;
@@ -36,13 +36,13 @@ public class NonPlayerCharacter : MonoBehaviour
         GameObject rubyControllerObject = GameObject.FindWithTag("RubyController");
         controller = rubyControllerObject.GetComponent<RubyController>();
 
-        if (controller.score >= controller.maxScore) {
+        if (controller.holdingQuestItem == true) {
             completeQuest.SetActive(true);
             if (acknowledgedQuestDone == false) {
                 acknowledgedQuestDone = true;
-                controller.fixRobotQuestDone = true;
+                controller.fetchSparePartsDone = true;
                 controller.PlaySound(questCompleted); } }
-        if (controller.score < controller.maxScore)
+        if (controller.holdingQuestItem == false)
             giveOutQuest.SetActive(true);
 
         timerDisplay = displayTime;

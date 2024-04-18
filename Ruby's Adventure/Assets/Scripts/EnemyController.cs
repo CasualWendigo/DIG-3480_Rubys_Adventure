@@ -6,7 +6,9 @@ using UnityEngine;
 {
     public float speed;
     public bool vertical;
-    public float changeTime = 3.0f;
+    public float patrolTime = 3.0f;
+    public int maxHitPoints = 3;
+    private int currentHitPoints;
 
     public ParticleSystem smokeEffect;
 
@@ -17,64 +19,54 @@ using UnityEngine;
     
     Animator animator;
 
+    AudioSource audioSource;
+    public AudioClip robotFixed;
+    public AudioClip metalHit1;
+    public AudioClip metalHit2;
+
+
     private RubyController rubyController;
     
-    // Start is called before the first frame update
     void Start()
     {
         GameObject rubyControllerObject = GameObject.FindWithTag("RubyController"); //this line of code finds the RubyController script by looking for a "RubyController" tag on Ruby
-
-        if (rubyControllerObject != null) {
-            rubyController = rubyControllerObject.GetComponent<RubyController>(); //and this line of code finds the rubyController and then stores it in a variable
-            print ("Found the RubyConroller Script!"); }
-
-        if (rubyController == null)
-            print ("Cannot find GameController Script!");
-
+        audioSource = GetComponent<AudioSource>();
         rigidbody2D = GetComponent<Rigidbody2D>();
-        timer = changeTime;
         animator = GetComponent<Animator>();
+
+        if (rubyControllerObject != null)
+            rubyController = rubyControllerObject.GetComponent<RubyController>(); //and this line of code finds the rubyController and then stores it in a variable
+        timer = patrolTime;
+        currentHitPoints = maxHitPoints;
     }
 
     void Update()
     {
-        //remember ! inverse the test, so if broken is true !broken will be false and return won’t be executed.
         if(!broken)
-        {
             return;
-        }
         
         timer -= Time.deltaTime;
-
-        if (timer < 0)
-        {
+        if (timer < 0) {
             direction = -direction;
-            timer = changeTime;
-        }
+            timer = patrolTime; }
     }
     
     void FixedUpdate()
     {
         //remember ! inverse the test, so if broken is true !broken will be false and return won’t be executed.
         if(!broken)
-        {
             return;
-        }
         
         Vector2 position = rigidbody2D.position;
         
-        if (vertical)
-        {
+        if (vertical) {
             position.y = position.y + Time.deltaTime * speed * direction;
             animator.SetFloat("Move X", 0);
-            animator.SetFloat("Move Y", direction);
-        }
-        else
-        {
+            animator.SetFloat("Move Y", direction); }
+        else {
             position.x = position.x + Time.deltaTime * speed * direction;
             animator.SetFloat("Move X", direction);
-            animator.SetFloat("Move Y", 0);
-        }
+            animator.SetFloat("Move Y", 0); }
         
         rigidbody2D.MovePosition(position);
     }
@@ -84,19 +76,29 @@ using UnityEngine;
         RubyController player = other.gameObject.GetComponent<RubyController >();
 
         if (player != null)
-        {
             player.ChangeHealth(-1);
-        }
     }
     
     //Public because we want to call it from elsewhere like the projectile script
     public void Fix()
-    {
-        broken = false;
-        rigidbody2D.simulated = false;
-        smokeEffect.Stop();
-        animator.SetBool("Broken", false);
+    {   
+        currentHitPoints -= 1;
 
-        rubyController.ChangeScore(1);
+        if (currentHitPoints <= 0) {
+            audioSource.PlayOneShot(robotFixed);
+            animator.SetBool("Broken", false);
+            rigidbody2D.simulated = false;
+            smokeEffect.Stop();
+            broken = false;
+            rubyController.ChangeScore(1);
+            return;
+        }
+
+        if (Random.value >= 0.5)
+            audioSource.PlayOneShot(metalHit1);
+        else
+            audioSource.PlayOneShot(metalHit2);
+
+
     }
 }

@@ -19,8 +19,10 @@ using System;
     public ParticleSystem hurtEffect;
     public ParticleSystem healEffect;
     
+    AudioSource audioSource;
     public AudioClip throwSound;
     public AudioClip hitSound;
+    public AudioClip lossSound;
     
     public int health { get { return currentHealth; }}
     int currentHealth;
@@ -34,28 +36,26 @@ using System;
     float vertical;
 
     private bool gameOver;
+    public bool fixRobotQuestDone = false;
+    public int score = 0;
+    public int maxScore = 4;
+    public bool holdingQuestItem = false;
+    public bool fetchSparePartsDone = false;
     
     Animator animator;
     Vector2 lookDirection = new Vector2(1,0);
-    
-    AudioSource audioSource;
-
-    public int score = 0;
-    public int maxScore = 4;
     
     // Start is called before the first frame update
     void Start()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        hurtEffect.Stop();
-        healEffect.Stop();
-        
+
         currentHealth = maxHealth;
 
         audioSource = GetComponent<AudioSource>();
 
-        scoreText.SetText("Fixed Robots: 0");
+        scoreText.SetText("x 0");
     }
 
     // Update is called once per frame
@@ -88,9 +88,15 @@ using System;
         if (Input.GetKeyDown(KeyCode.X)) {
             RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("NPC"));
             if (hit.collider != null) {
-                NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
-                if (character != null) {
-                    character.DisplayDialog(); } } }
+                NonPlayerCharacter jambi = hit.collider.GetComponent<NonPlayerCharacter>();
+                QuestGiverQuackers quackers = hit.collider.GetComponent<QuestGiverQuackers>();
+                if (jambi != null) 
+                    jambi.DisplayDialog();
+                if (quackers != null)
+                    quackers.DisplayDialog();
+                
+                if (fixRobotQuestDone && fetchSparePartsDone)
+                    youWinScreen.SetActive(true); } }
 
         // Restart
         if (Input.GetKey(KeyCode.R)) {
@@ -129,6 +135,7 @@ using System;
         if (currentHealth <= 0) {
             gameOver = true;
             gameOverScreen.SetActive(true);
+            PlaySound(lossSound);
             speed = 0;
         }
     }
@@ -136,11 +143,7 @@ using System;
     public void ChangeScore(int scoreAmount)
     {
         score = score + scoreAmount;
-        scoreText.text = "Fixed Robots: " + score.ToString();
-
-        if (score >= maxScore) {
-            youWinScreen.SetActive(true);
-        }
+        scoreText.text = "x " + score.ToString();
     }
     
     void Launch()

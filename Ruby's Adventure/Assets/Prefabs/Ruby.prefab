@@ -50,7 +50,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -4933,9 +4933,14 @@ MonoBehaviour:
   healEffect: {fileID: 492677495722491980}
   throwSound: {fileID: 8300000, guid: b2edfd40873655249ba0e01a5cf705be, type: 3}
   hitSound: {fileID: 8300000, guid: 9b1bb1f450b7d444fa4a8019d13519a7, type: 3}
+  lossSound: {fileID: 0}
   timeInvincible: 2
+  confetti: {fileID: 0}
+  fixRobotQuestDone: 0
   score: 0
   maxScore: 4
+  holdingQuestItem: 0
+  fetchSparePartsDone: 0
 --- !u!212 &6080540336434509356
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5202,7 +5207,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
